@@ -7,7 +7,7 @@ yarn-error.log*
 test/unit/coverage
 test/e2e/reports
 selenium-debug.log
-databases/TaskDB.sqlite3
+databases/tasklogDB.sqlite3
 
 # Editor directories and files
 .idea
