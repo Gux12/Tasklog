@@ -5,10 +5,14 @@ import App from './App'
 import router from './router'
 import store from './store'
 // vendor
-import ElementUI from 'element-ui'
-import '@/scss/theme/index.css'
+// import ElementUI from 'element-ui'
+// import '@/scss/theme/index.css'
+import MintUI from 'mint-ui'
+import 'mint-ui/lib/style.css'
+import '@/scss/main.scss'
 // 全局中间件
-Vue.use(ElementUI)
+// Vue.use(ElementUI)
+Vue.use(MintUI)
 
 Vue.config.productionTip = false
 

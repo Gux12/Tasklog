@@ -1,0 +1,25 @@
+.mint-header {
+  background-color: #309990;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+  font-size: 24px;
+  height: 60px;
+}
+
+.mint-tabbar {
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 2px 0 rgba(0,0,0,0.16);
+  .mint-tab-item {
+    background-color: lighten(#f7ba2a, 10%);
+    color: #ffffff;
+    &.is-selected {
+      background-color: #f7ba2a;
+      color: #ffffff;
+    }
+    .mint-tab-item-label {
+      height: 48px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+    }
+  }
+}
