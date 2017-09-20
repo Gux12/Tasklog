@@ -19,9 +19,8 @@ const actions = {
     commit('editTask', {task, title})
   },
   async toggleTaskAsync ({commit, state}, {task}) {
-    console.log(task.uid)
-    await TaskAPI.editTask(task.uid, {done: !task.done})
-    commit('toggleTask', {task})
+    let newTask = await TaskAPI.editTask(task.uid, {done: !task.done})
+    commit('toggleTask', {task, newTask})
   }
 }
 

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Hello from '@/components/Hello'
-import Tasklog from '@/components/Tasklog'
+import Tasks from '@/components/Tasks'
 
 Vue.use(Router)
 
@@ -14,12 +14,34 @@ export default new Router({
     },
     {
       path: '/task/:type',
-      name: 'Tasklog',
-      component: Tasklog
+      name: 'Tasks',
+      component: Tasks
     },
     {
       path: '/task',
-      redirect: '/task/all'
+      redirect: '/task/active'
+    },
+    {
+      path: '/log/:type',
+      name: 'Logs',
+      component: Hello
+    },
+    {
+      path: '/log',
+      redirect: '/log/active'
+    },
+    {
+      path: '/recycle/:type',
+      name: 'Recycles',
+      component: Hello
+    },
+    {
+      path: '/recycle',
+      redirect: '/recycle/active'
+    },
+    {
+      path: '*',
+      redirect: '/task/active'
     }
   ]
 })

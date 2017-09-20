@@ -16,8 +16,9 @@ export const mutations = {
     state.tasks.splice(state.tasks.indexOf(task), 1)
   },
 
-  toggleTask (state, {task}) {
-    task.done = !task.done
+  toggleTask (state, {task, newTask}) {
+    task.done = newTask.done
+    task.done_time = newTask.done_time
   },
 
   editTask (state, {task, title}) {
