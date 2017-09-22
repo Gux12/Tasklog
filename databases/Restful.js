@@ -36,9 +36,51 @@ let Restful = function (keys, db, tableName) {
     })
   }
   // 查找所有的
-  this.findAll = function (cb) {
-    console.log('SELECT * FROM ' + tableName)
-    db.all('SELECT * FROM ' + tableName, cb)
+  this.findAll = function (options, cb) {
+    // 查询返回升序降序选项
+    let orderString = ' ORDER BY '
+    if (options.orders !== undefined) {
+      let orders = options.orders
+      let newOrders = []
+      for (let order of orders) {
+        let retStr = order.order ? (order.key + ' ' + order.order) : ''
+        if (retStr !== '') newOrders.push(retStr)
+      }
+      if (newOrders.length) {
+        newOrders.map(function (order, index) {
+          orderString += (index === 0 || order === '' ? '' : ', ') + order
+        })
+      } else {
+        orderString = ''
+      }
+    }
+    // 查询范围选项
+    let scaleString = ' WHERE '
+    if (options.scales !== undefined) {
+      let scales = options.scales
+      let newScales = []
+      for (let scale of scales) {
+        let retStr
+        if (scale.value !== null) {
+          retStr = `${scale.key}=${scale.value}`
+        } else {
+          retStr = (scale.start !== null ? (scale.key + ' >= ' + scale.start) : '') +
+            ((scale.start === null || scale.end === null) ? '' : ' AND ') +
+            (scale.end !== null ? (scale.key + ' <= ' + scale.end) : '')
+        }
+        if (retStr !== '') newScales.push(retStr)
+      }
+
+      if (newScales.length) {
+        newScales.map(function (scale, index) {
+          scaleString += (index === 0 ? '' : ' AND ') + scale
+        })
+      } else {
+        scaleString = ''
+      }
+    }
+    console.log('SELECT * FROM ' + tableName + scaleString + orderString)
+    db.all('SELECT * FROM ' + tableName + scaleString + orderString, cb)
   }
   // 查找某条
   this.find = function (uid, cb) {

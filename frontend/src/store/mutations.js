@@ -1,9 +1,12 @@
 export const state = {tasks: []}
 
 export const mutations = {
-  setTasks (state, {tasks}) {
+  appendTasks (state, {tasks}) {
     tasks.forEach(function (task) {
       state.tasks.push(task)
+    })
+    state.tasks.sort(function (a, b) {
+      return b.create_time - a.create_time
     })
   },
   clearTasks (state) {
@@ -11,6 +14,9 @@ export const mutations = {
   },
   addTask (state, {task}) {
     state.tasks.push(task)
+    state.tasks.sort(function (a, b) {
+      return b.create_time - a.create_time
+    })
   },
   deleteTask (state, {task}) {
     state.tasks.splice(state.tasks.indexOf(task), 1)

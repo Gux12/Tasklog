@@ -1,5 +1,19 @@
 <template>
-  <mt-cell-swipe :title="task.title" :right="rightBtn" :class="{ completed: done, editing: editing, task: true}">
+  <mt-cell-swipe :right="rightBtn" :class="{ completed: done, editing: editing, task: true}">
+    <div slot="title">
+      <span class="title" v-show="!editing" @click="editing = true">{{task.title}}</span>
+      <textarea class="edit"
+           contenteditable="true"
+           v-show="editing"
+           v-focus="editing"
+           :value="task.title"
+           @keyup.enter="doneEdit"
+           @keyup.esc="cancelEdit"
+           @touchstart.stop
+           @touchmove.stop
+           @blur="doneEdit">
+      </textarea>
+    </div>
     <div class="time">
       <span v-text="'创建于' + new Date(task.create_time).toLocaleString()" class="create_time"></span>
       <span v-show="task.done_time" v-text="'完成于' + new Date(task.done_time).toLocaleString()" class="done_time"></span>
@@ -7,21 +21,6 @@
             class="used_time"></span>
     </div>
     <mt-switch class="toggle" :value="done" @change="doneToggle"></mt-switch>
-    <!--<div class="view">-->
-    <!--<input class="toggle"-->
-    <!--type="checkbox"-->
-    <!--:checked="task.done"-->
-    <!--@change="toggleTaskAsync({ task })">-->
-    <!--<label v-text="task.title" @dblclick="editing = true"></label>-->
-    <!--<button class="destroy" @click="deleteTaskAsync({ task })"></button>-->
-    <!--</div>-->
-    <!--<input class="edit"-->
-    <!--v-show="editing"-->
-    <!--v-focus="editing"-->
-    <!--:value="task.title"-->
-    <!--@keyup.enter="doneEdit"-->
-    <!--@keyup.esc="cancelEdit"-->
-    <!--@blur="doneEdit">-->
   </mt-cell-swipe>
 </template>
 
@@ -29,6 +28,7 @@
   import { mapMutations, mapActions } from 'vuex'
   import { Indicator } from 'mint-ui'
 
+  let Hammer = require('hammerjs')
   export default {
     name: 'Task',
     props: ['task'],
@@ -58,10 +58,19 @@
       }
     },
     directives: {
-      focus (el, {value}, {context}) {
+      focus: function (el, {value}, {context}) {
         if (value) {
           context.$nextTick(() => {
             el.focus()
+          })
+        }
+      },
+      press: {
+        bind: function (el, {arg, value}, {context}) {
+          let mc = new Hammer.Manager(el)
+          mc.add(new Hammer.Press({time: arg}))
+          mc.on('press', function () {
+            value(el)
           })
         }
       }
@@ -85,6 +94,7 @@
         Indicator.close()
       },
       doneEdit (e) {
+        console.log(e)
         const title = e.target.value.trim()
         const {task} = this
         if (!title) {
@@ -146,6 +156,44 @@
           border-radius: 5px;
           color: white;
         }
+      }
+    }
+    .title {
+      position: relative;
+      margin: 0;
+      width: 100%;
+      font-size: 1rem;
+      font-family: inherit;
+      font-weight: inherit;
+      line-height: 1.4em;
+      border: 0;
+      color: inherit;
+      padding: 6px;
+      box-sizing: border-box;
+      font-smoothing: antialiased;
+      display: block;
+      padding: 12px 16px;
+    }
+    .edit {
+      position: relative;
+      margin: 0;
+      width: 90%;
+      font-size: 1rem;
+      font-family: inherit;
+      font-weight: inherit;
+      line-height: 1.4em;
+      color: inherit;
+      padding: 6px;
+      box-sizing: border-box;
+      font-smoothing: antialiased;
+      display: block;
+      padding: 12px 16px;
+      &:focus {
+        border: 3px solid #f7ba2a;
+        box-shadow: none;
+        border-radius: 0px;
+        outline: none;
+        overflow-wrap: break-word;
       }
     }
     .time {

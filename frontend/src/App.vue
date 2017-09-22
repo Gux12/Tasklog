@@ -19,11 +19,11 @@
     data () {
       return {
         paths: [
-          {'path': '/task/all', 'value': '任务流'},
-          {'path': '/log/all', 'value': '工作流'},
-          {'path': '/recycle/all', 'value': '回收站'}
+          {'path': '/task/active', 'value': '任务流'},
+          {'path': '/log/active', 'value': '工作流'},
+          {'path': '/recycle/active', 'value': '回收站'}
         ],
-        selected: '/task'
+        selected: '/task/active'
       }
     },
     methods: {},

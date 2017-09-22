@@ -46,7 +46,7 @@ body {
     padding: 0;
     border-bottom: none;
     //border-top: 3px solid lighten(#309990, 10%);
-    transition: flex-grow 0.3s cubic-bezier(.645,.045,.355,1);
+    transition: flex-grow 0.3s cubic-bezier(.645, .045, .355, 1);
     &.is-selected {
       background-color: lighten(#309990, 5%);
       color: #ffffff;
@@ -68,15 +68,20 @@ body {
   }
 }
 
-.mint-cell:last-child{
-  background-image: none;
-}
-.mint-cell-wrapper{
+.mint-cell:last-child {
   background-image: none;
 }
 
+.mint-cell-wrapper {
+  background-image: none;
+  padding: 0;
+}
 
-.mint-switch-input:checked + .mint-switch-core{
+.mint-switch-input:checked + .mint-switch-core {
   border-color: #309990;
   background-color: #309990;
+}
+
+.mint-cell-text {
+  padding: 0 10px;
 }

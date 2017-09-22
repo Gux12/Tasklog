@@ -1,25 +1,29 @@
 import * as TaskAPI from '@/api/task'
 
 const actions = {
-  async initTasks ({commit, state}) {
-    let tasks = await TaskAPI.findAllTask()
+  async initTasks ({commit, state}, options) {
+    let tasks = await TaskAPI.findAllTask('/' + options)
     commit('clearTasks')
-    commit('setTasks', {tasks})
+    commit('appendTasks', {tasks})
+  },
+  async appendTasksAsync ({commit, state}, options) {
+    let tasks = await TaskAPI.findAllTask('/' + options)
+    commit('appendTasks', {tasks})
   },
   async addTaskAsync ({commit, state}, task) {
     task = await TaskAPI.addTask(task)
     commit('addTask', {task})
   },
   async deleteTaskAsync ({commit, state}, {task}) {
-    await TaskAPI.deleteTask(task.uid)
+    await TaskAPI.deleteTask('/' + task.uid)
     commit('deleteTask', {task})
   },
   async editTaskAsync ({commit, state}, {task, title}) {
-    await TaskAPI.editTask(task.uid, {title})
+    await TaskAPI.editTask('/' + task.uid, {title})
     commit('editTask', {task, title})
   },
   async toggleTaskAsync ({commit, state}, {task}) {
-    let newTask = await TaskAPI.editTask(task.uid, {done: !task.done})
+    let newTask = await TaskAPI.editTask('/' + task.uid, {done: !task.done})
     commit('toggleTask', {task, newTask})
   }
 }
