@@ -11,5 +11,5 @@ if (!fs.existsSync(path.join(__dirname, 'databases'))) {
 }
 
 var sqlite3 = require('sqlite3').verbose()
-var db = new sqlite3.Database(path.join(__dirname, 'databases', 'tasklogDB.sqlite3'))
+var db = new sqlite3.Database(path.join(__dirname, '../databases', 'tasklogDB.sqlite3'))
 module.exports = db

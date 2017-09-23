@@ -17,7 +17,6 @@ export function get (url, data) {
 
 export function post (url, data) {
   data = cleanData(data)
-  console.log(url, data)
   return axios.post(url, data)
 }
 

@@ -1,17 +1,17 @@
 <template>
   <div>
-    <mt-header title="TaskLog" :fixed="true">
+    <mt-header :title="`${$store.state.user.user?$store.state.user.user.username+'\'s':''} TaskLog`" :fixed="true">
       <router-link to="/task/all" slot="left">
         <mt-button><img src="../src/assets/logo.png" height="30" width="30" slot="icon"></mt-button>
       </router-link>
-      <mt-button slot='right' icon="more" @click="$router.go(0)"></mt-button>
+      <mt-button slot='right' @click="logout">退出</mt-button>
     </mt-header>
     <mt-navbar v-model="selected" class="mt_navbar">
       <mt-tab-item v-for="(path,index) in paths" :id="path.path" :key="index" @click.native="$router.push(path.path)">
         {{path.value}}
       </mt-tab-item>
     </mt-navbar>
-    <router-view></router-view>
+    <router-view class="router_view"></router-view>
   </div>
 </template>
 <script>
@@ -26,18 +26,22 @@
         selected: '/task/active'
       }
     },
-    methods: {},
+    methods: {
+      async logout () {
+        await this.$store.dispatch('user/logout')
+        this.$router.push('/login')
+      }
+    },
     created () {
       this.selected = this.$route.path
     }
   }
 </script>
-<style lang="scss">
-  .mt_navbar {
-    top: 48px;
-    right: 0;
-    left: 0;
-    position: fixed;
-    z-index: 2;
+<style lang="scss" scoped>
+  .router_view {
+    top: 84px;
+    bottom: 0px;
+    width: 100%;
+    position: absolute;
   }
 </style>

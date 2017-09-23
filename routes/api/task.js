@@ -21,48 +21,44 @@ router.get('/list', function (req, res, next) {
 })
 // 查询所有的任务中符合条件的
 router.get('/list/:options', function (req, res, next) {
-    function query2json (query) {
-      let resObj = {}
-      let keyValues = query.split('&')
-      for (let keyValue of keyValues) {
-        resObj[keyValue.split('=')[0]] = keyValue.split('=')[1]
-      }
-      return resObj
+  function query2json (query) {
+    let resObj = {}
+    let keyValues = query.split('&')
+    for (let keyValue of keyValues) {
+      resObj[keyValue.split('=')[0]] = keyValue.split('=')[1]
     }
+    return resObj
+  }
 
-    console.log(req.url.split('/'))
-    for (let url of req.url.split('/')) {
-      if (url !== '' && url !== 'list') {
-        let resObj = {
-          order: {
-            key: '',
-            order: ''
-          },
-          scale: {
-            key: '',
-            start: '',
-            end: '',
-            value: ''
-          }
-        }
-        console.log(url)
-        let json = query2json(url.split('?')[1])
-        let KEY = url.split('?')[0]
-        console.log(KEY)
-        for (let key1 in resObj) {
-          for (let key2 in resObj[key1]) {
-            if (key2 === 'key') resObj[key1][key2] = KEY
-            else {
-              resObj[key1][key2] = json[key2] ? json[key2] : null
-            }
-          }
-          options[key1 + 's'].push(resObj[key1])
+  for (let url of req.url.split('/')) {
+    if (url !== '' && url !== 'list') {
+      let resObj = {
+        order: {
+          key: '',
+          order: ''
+        },
+        scale: {
+          key: '',
+          start: '',
+          end: '',
+          value: ''
         }
       }
+      let json = query2json(url.split('?')[1])
+      let KEY = url.split('?')[0]
+      for (let key1 in resObj) {
+        for (let key2 in resObj[key1]) {
+          if (key2 === 'key') resObj[key1][key2] = KEY
+          else {
+            resObj[key1][key2] = json[key2] ? json[key2] : null
+          }
+        }
+        options[key1 + 's'].push(resObj[key1])
+      }
     }
-    next()
+  }
+  next()
 }, function (req, res) {
-  console.log(options)
   DB.task.findAll(options, function (err, data) {
     if (!err) res.send({ResultCode: 0, Record: data})
     else res.send({ResultCode: 1, Record: err})
@@ -94,7 +90,7 @@ router.route('/item/:task_id')
     next()
   })
   .get(function (req, res, next) {
-    DB.task.find(req.params.task_id, function (err, data) {
+    DB.task.find('uid', req.params.task_id, function (err, data) {
       if (!err) res.send({ResultCode: 0, Record: data})
       else res.send({ResultCode: 1, Record: err})
     })
@@ -107,7 +103,7 @@ router.route('/item/:task_id')
     }
     DB.task.modify(req.params.task_id, req.body, function (err, data) {
       if (!err) {
-        DB.task.find(req.params.task_id, function (err, data) {
+        DB.task.find('uid', req.params.task_id, function (err, data) {
           if (!err) res.send({ResultCode: 0, Record: data})
           else res.send({ResultCode: 1, Record: err})
         })

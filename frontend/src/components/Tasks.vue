@@ -2,7 +2,7 @@
   <section class="taskapp" v-loading="!ready">
     <!-- header -->
     <header class="header">
-      <mt-field label="任务" placeholder="完成了什么？" @keyup.native.enter="addTask" v-model="taskInput">
+      <mt-field label="任务" type="text" placeholder="完成了什么？" @keyup.native.enter="addTask" v-model="taskInput">
       </mt-field>
     </header>
     <!-- main section -->
@@ -146,7 +146,7 @@
         var title = this.taskInput
         if (title.trim()) {
           Indicator.open()
-          await this.addTaskAsync({title, done: false})
+          await this.addTaskAsync({title, done: false, user_uid: this.$store.state.user.user.uid})
           Indicator.close()
         }
         this.taskInput = ''
@@ -163,13 +163,13 @@
         'appendTasksAsync'
       ]),
       async loadTop () {
-        await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}`)
+        await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
         this.currentShowDays = this.showDays
         this.allLoaded = false
         this.$refs.loadmore.onTopLoaded()
       },
       async loadBottom () {
-        await this.appendTasksAsync(`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}`)
+        await this.appendTasksAsync(`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
 //        if (res === '') this.allLoaded = true
         this.currentShowDays += this.loadMoreDays
         this.$refs.loadmore.onBottomLoaded()
@@ -179,7 +179,6 @@
       loading (el, binding, {context}) {
         if (!context.ready) Indicator.open()
         else Indicator.close()
-        console.log(context.ready)
       }
     },
     filters: {
@@ -187,7 +186,7 @@
       namelize: s => filtersName[s]
     },
     async created () {
-      await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}`)
+      await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
       this.ready = true
     }
   }
@@ -198,7 +197,6 @@
 
   .taskapp {
     .header {
-      top: 84px;
       display: block;
       position: fixed;
       width: 100%;
@@ -212,7 +210,7 @@
       /*background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#309990), to(#f7ba2a));*/
       /*background-color: #eeeeee;*/
       position: absolute;
-      top: 132px;
+      top: 48px;
       bottom: 48px;
       width: 100%;
       overflow-y: auto;

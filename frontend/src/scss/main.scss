@@ -85,3 +85,11 @@ body {
 .mint-cell-text {
   padding: 0 10px;
 }
+
+.mt_navbar {
+  top: 48px;
+  right: 0;
+  left: 0;
+  position: fixed;
+  z-index: 2;
+}

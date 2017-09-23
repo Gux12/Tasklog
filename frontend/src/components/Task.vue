@@ -45,7 +45,6 @@
               alignItems: 'center'
             },
             handler: () => this.$messagebox.confirm('确定执行此操作?').then(async action => {
-              console.log(action)
               let {task} = this
               Indicator.open()
               await this.deleteTaskAsync({task})
@@ -94,7 +93,6 @@
         Indicator.close()
       },
       doneEdit (e) {
-        console.log(e)
         const title = e.target.value.trim()
         const {task} = this
         if (!title) {

@@ -83,9 +83,9 @@ let Restful = function (keys, db, tableName) {
     db.all('SELECT * FROM ' + tableName + scaleString + orderString, cb)
   }
   // 查找某条
-  this.find = function (uid, cb) {
-    console.log('SELECT * FROM ' + tableName + ' WHERE uid = ' + uid)
-    db.get('SELECT * FROM ' + tableName + ' WHERE uid = ?', [uid], cb)
+  this.find = function (key, value, cb) {
+    console.log(`SELECT * FROM ${tableName} WHERE ${key} = ${value}`)
+    db.get(`SELECT * FROM ${tableName} WHERE ${key} = ?`, [value], cb)
   }
   // 删除某条
   this.delete = function (uid, cb) {
@@ -95,9 +95,7 @@ let Restful = function (keys, db, tableName) {
   // 修改某条
   this.modify = function (uid, data, cb) {
     if (data instanceof Object) {
-      console.log('JSON Object')
     } else {
-      console.log('JSON String')
       data = JSON.parse(data)
     }
     let setStirng = ' SET '
