@@ -29,8 +29,6 @@ app.use(express.static(path.join(__dirname, 'frontend/dist/')))
 let sess = {
   secret: 'keyboard cat',
   // store: new redisStore({host:'localhost',port:'6379'}),
-  secure: true,
-  cookie: {maxAge: 600000}
 }
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1) // trust first proxy

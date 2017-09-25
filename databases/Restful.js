@@ -94,23 +94,24 @@ let Restful = function (keys, db, tableName) {
   }
   // 修改某条
   this.modify = function (uid, data, cb) {
-    if (data instanceof Object) {
-    } else {
-      data = JSON.parse(data)
-    }
     let setStirng = ' SET '
-    let param = []
-    let data_index = 0
+    // 参数值
+    let paramVal = []
+    // 参数键
+    let paramKey = []
     keys.forEach(function (key, index) {
       if (data[key] !== undefined) {
-        setStirng += key + (data_index === Object.keys(data).length - 1 ? ' = ? ' : ' = ?, ')
-        param.push(data[key])
-        data_index++
+        paramKey.push(key)
+        paramVal.push(data[key])
       }
     })
-    param.push(uid)
-    console.log('UPDATE ' + tableName + setStirng + 'WHERE uid = ?', param)
-    db.run('UPDATE ' + tableName + setStirng + 'WHERE uid = ?', param, cb)
+    for (let i = 0; i < paramKey.length; i++) {
+      console.log(paramKey[i])
+      setStirng += paramKey[i] + (i === paramKey.length - 1 ? ' = ? ' : ' = ?, ')
+    }
+    paramVal.push(uid)
+    console.log('UPDATE ' + tableName + setStirng + 'WHERE uid = ?', paramVal)
+    db.run('UPDATE ' + tableName + setStirng + 'WHERE uid = ?', paramVal, cb)
   }
 }
 

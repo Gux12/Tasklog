@@ -2,11 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Hello from '@/components/Hello'
 import Tasks from '@/components/Tasks'
+import Logs from '@/components/Logs'
 import Login from '@/components/Login'
 import store from '@/store'
+// import { sessionStorage } from '@/utils/storage'
 
 Vue.use(Router)
-
 let flag = 0
 
 const router = new Router({
@@ -34,13 +35,9 @@ const router = new Router({
       redirect: '/task/active'
     },
     {
-      path: '/log/:type',
-      name: 'Logs',
-      component: Hello
-    },
-    {
       path: '/log',
-      redirect: '/log/active'
+      name: 'Logs',
+      component: Logs
     },
     {
       path: '/recycle/:type',
@@ -52,28 +49,30 @@ const router = new Router({
       redirect: '/recycle/active'
     },
     {
+      path: '/',
+      redirect: '/log'
+    },
+    {
       path: '*',
-      redirect: '/task/active'
+      redirect: '/hello'
     }
   ]
 })
 
 router.beforeEach(async (to, from, next) => {
-  console.log(to)
-  console.log(`flag: ${flag}`)
+  // 每次刷新页面的时候flag初始化为0所以会触发一次后端验证
+  // 后端采用不过期session，只要登录一次cookie永久保留
   if (!flag) {
     await store.dispatch('user/initUserAsync')
     flag++
   }
-  if (to.meta.auth !== false) {
-    if (store.getters['user/isAuthed']) {
-      next()
-    } else {
-      next('/login')
-    }
+  console.log(`from '${from.path}' to '${to.path}'`)
+  if (store.getters['user/isAuthed']) {
+    if (to.path === '/login') next(false)
+    else next()
   } else {
-    console.log('/login')
-    next()
+    if (to.meta.auth === false) next()
+    else next('/login')
   }
 })
 

@@ -1,37 +1,33 @@
 <template>
-  <mt-cell-swipe :right="rightBtn" :class="{ completed: done, editing: editing, task: true}">
+  <mt-cell-swipe :right="rightBtn" :class="{ editing: editing, log: true}">
     <div slot="title">
-      <span class="title" v-show="!editing" @click="editing = true">{{task.title}}</span>
+      <span class="title" v-show="!editing" @click="editing = true">{{log.title}}</span>
       <textarea class="edit"
-           contenteditable="true"
-           v-show="editing"
-           v-focus="editing"
-           :value="task.title"
-           @keyup.enter="doneEdit"
-           @keyup.esc="cancelEdit"
-           @touchstart.stop
-           @touchmove.stop
-           @blur="doneEdit">
+                contenteditable="true"
+                v-show="editing"
+                v-focus="editing"
+                :value="log.title"
+                @keyup.enter="doneEdit"
+                @keyup.esc="cancelEdit"
+                @touchstart.stop
+                @touchmove.stop
+                @blur="doneEdit">
       </textarea>
     </div>
     <div class="time">
-      <span v-text="'创建于' + new Date(task.create_time).toLocaleString()" class="create_time"></span>
-      <span v-show="task.done_time" v-text="'完成于' + new Date(task.done_time).toLocaleString()" class="done_time"></span>
-      <span v-show="task.done_time" v-text="timestampToStirng(task.create_time, task.done_time)"
-            class="used_time"></span>
+      <span v-text="'完成于' + new Date(log.create_time).toLocaleString()" class="create_time"></span>
     </div>
-    <mt-switch class="toggle" :value="done" @change="doneToggle"></mt-switch>
   </mt-cell-swipe>
 </template>
 
 <script>
-  import { mapMutations, mapActions } from 'vuex'
+  import { mapActions } from 'vuex'
   import { Indicator } from 'mint-ui'
 
   let Hammer = require('hammerjs')
   export default {
-    name: 'Task',
-    props: ['task'],
+    name: 'log',
+    props: ['log'],
     data () {
       return {
         editing: false,
@@ -45,9 +41,9 @@
               alignItems: 'center'
             },
             handler: () => this.$messagebox.confirm('确定执行此操作?').then(async action => {
-              let {task} = this
+              let {log} = this
               Indicator.open()
-              await this.deleteTaskAsync({task})
+              await this['log/deleteLogAsync']({log})
               Indicator.close()
             }).catch(err => {
               err
@@ -74,41 +70,28 @@
         }
       }
     },
-    computed: {
-      done () {
-        return this.task.done === 1 || this.task.done === true
-      }
-    },
     methods: {
-      ...mapMutations([]),
       ...mapActions([
-        'deleteTaskAsync',
-        'editTaskAsync',
-        'toggleTaskAsync'
+        'log/deleteLogAsync',
+        'log/editLogAsync'
       ]),
-      async doneToggle (e) {
-        Indicator.open()
-        const {task} = this
-        await this.toggleTaskAsync({task})
-        Indicator.close()
-      },
       doneEdit (e) {
         const title = e.target.value.trim()
-        const {task} = this
+        const {log} = this
         if (!title) {
-          this.deleteTaskAsync({
-            task
+          this['log/deleteTaskAsync']({
+            log
           })
         } else if (this.editing) {
-          this.editTaskAsync({
-            task,
+          this['log/editLogAsync']({
+            log,
             title
           })
           this.editing = false
         }
       },
       cancelEdit (e) {
-        e.target.value = this.task.title
+        e.target.value = this.log.title
         this.editing = false
       },
       timestampToStirng (start, end) {
@@ -126,36 +109,9 @@
 </script>
 
 <style lang="scss">
-  .task {
+  .log {
     background-color: transparent;
     border-top: 1px solid rgba(0, 0, 0, 0.12);
-    &.completed {
-      color: #999999;
-      & .mint-cell-title {
-        text-decoration: line-through;
-      }
-      .time {
-        .create_time {
-          text-decoration: line-through;
-          background-color: #999999;
-        }
-        .done_time {
-          margin-top: 5px;
-          margin-bottom: 5px;
-          background-color: #309990;
-          padding: 5px 5px;
-          border-radius: 5px;
-          color: white;
-        }
-        .used_time {
-          margin-bottom: 5px;
-          background-color: #309990;
-          padding: 5px 5px;
-          border-radius: 5px;
-          color: white;
-        }
-      }
-    }
     .title {
       position: relative;
       margin: 0;
@@ -171,7 +127,6 @@
       font-smoothing: antialiased;
       display: block;
       padding: 12px 16px;
-      word-break: break-all;
     }
     .edit {
       position: relative;
@@ -203,7 +158,7 @@
       margin-right: 20px;
       .create_time {
         margin-top: 5px;
-        background-color: brown;
+        background-color: #309990;
         padding: 5px 5px;
         border-radius: 5px;
         color: white;

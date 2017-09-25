@@ -1,6 +1,8 @@
 body {
   margin: 0px;
   font-family: Arial, 'Times New Roman', 'Microsoft YaHei', SimHei;
+  height: 100%;
+  background-color: #309990;
 }
 
 * {
@@ -18,11 +20,11 @@ body {
 .mint-tabbar {
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 2px 0 rgba(0, 0, 0, 0.16);
   .mint-tab-item {
-    background-color: lighten(#f7ba2a, 10%);
+    background-color: darken(#f7ba2a, 5%);
     color: #ffffff;
     padding: 0;
     &.is-selected {
-      background-color: #f7ba2a;
+      background-color: darken(#f7ba2a, 0%);
       color: #ffffff;
     }
     .mint-tab-item-label {
@@ -39,7 +41,7 @@ body {
 }
 
 .mint-navbar {
-  background-color: lighten(#309990, 10%);
+  background-color: lighten(#309990, 0%);
   .mint-tab-item {
     //margin: auto 5px;
     color: #ffffff;
@@ -53,7 +55,7 @@ body {
       margin-bottom: auto;
       //border-top: 3px solid lighten(#309990, 10%);
       border-bottom: none;
-      flex-grow: 2
+      flex-grow: 1.5
     }
     .mint-tab-item-label {
       height: 36px;

@@ -5,14 +5,17 @@ export default {
   state: {user: null},
   mutations: {
     initUser (state, user) {
-      console.log(user)
       state.user = user
+    },
+    clearUser (state) {
+      state.user = null
     }
   },
   actions: {
     async initUserAsync ({commit, state}) {
       try {
         let user = await UserAPI.profile()
+        console.log(user)
         commit('initUser', user)
       } catch (e) {
         commit('initUser', null)
@@ -20,10 +23,11 @@ export default {
     },
     async logout ({commit}) {
       await UserAPI.logout()
-      commit('initUser', null)
+      commit('clearUser')
     },
     async login ({commit}, {username, pwd}) {
       let user = await UserAPI.login({username, pwd})
+      console.log(user)
       commit('initUser', user)
     }
   },

@@ -2,11 +2,11 @@
   <section class="taskapp" v-loading="!ready">
     <!-- header -->
     <header class="header">
-      <span class="header_label">任务</span>
-      <div contenteditable="true" class="header_input" @input="taskInput = arguments[0].target.innerText"
-           placeholder="创建任务吧！" ref="header_input">
+      <span class="header_label">工作</span>
+      <div contenteditable="true" class="header_input" @input="logInput = arguments[0].target.innerText"
+           placeholder="完成了什么工作？" ref="header_input">
       </div>
-      <mt-button type="primary" @click="addTask" class="header_btn">提交</mt-button>
+      <mt-button type="primary" @click="addLog" class="header_btn">提交</mt-button>
     </header>
     <!-- main section -->
     <section class="main">
@@ -20,23 +20,23 @@
           class="main_year"
           v-for="(months,year) in timeLine"
           :key="year"
-          v-if="ready && filteredTasks!==undefined && filteredTasks[year]!==undefined">
+          v-if="ready && filteredLogs!==undefined && filteredLogs[year]!==undefined">
           <section
             class="main_month"
             v-for="(dates,month) in months"
             :key="month"
-            v-if="filteredTasks[year][month]!==undefined">
+            v-if="filteredLogs[year][month]!==undefined">
             <h1>{{year}}年{{month}}月</h1>
             <section
               class="main_date"
               v-for="date in dates"
               :key="date"
-              v-if="filteredTasks[year][month][date]!==undefined">
+              v-if="filteredLogs[year][month][date]!==undefined">
               <h1>{{month}}月{{date}}日</h1>
               <section class="main_tasks">
-                <Task
-                  v-for="(task, index) in filteredTasks[year][month][date]"
-                  :key="task.title" :task="task"></Task>
+                <Log
+                  v-for="(log, index) in filteredLogs[year][month][date]"
+                  :key="log.title" :log="log"></Log>
               </section>
             </section>
           </section>
@@ -46,56 +46,34 @@
         </section>
       </mt-loadmore>
     </section>
-    <!-- footer -->
-    <mt-tabbar :value="visibility" :fixed="true">
-      <mt-tab-item v-for="(val, key) in filters" :id="key" :key="key" @click.native="$router.push('/task/' + key)">
-        <span>{{ key | namelize }}
-          <mt-badge size="large" type="error" v-if="key === 'active' || key === 'all'">{{active}}</mt-badge>
-          <mt-badge size="large" type="success" v-else="key === 'completed'">{{completed}}</mt-badge>
-        </span>
-      </mt-tab-item>
-    </mt-tabbar>
   </section>
 </template>
 
 <script>
-  import { mapMutations, mapActions } from 'vuex'
-  import Task from '@/components/Task.vue'
+  import { mapActions } from 'vuex'
+  import Log from '@/components/Log.vue'
   import { Toast, Indicator } from 'mint-ui'
 
-  const filters = {
-    all: tasks => tasks,
-    active: tasks => tasks.filter(task => !task.done),
-    completed: tasks => tasks.filter(task => task.done)
-  }
-
-  const filtersName = {
-    all: '全部',
-    active: '未完成',
-    completed: '已完成'
-  }
-
   export default {
-    components: {Task},
+    components: {Log},
     data () {
       return {
-        filters: filters,
-        taskInput: '',
+        logInput: '',
         showDays: 4,
-        loadMoreDays: 2,
+        loadMoreDays: 1,
         currentShowDays: 4,
         ready: false,
         allLoaded: false
       }
     },
     computed: {
-      tasks () {
-        return this.$store.state.tasks
+      logs () {
+        return this.$store.state.log.logs
       },
-      filteredTasks () {
-        let filteredTasks = filters[this.visibility](this.tasks)
+      filteredLogs () {
+        let filteredLogs = this.logs
         let groupByDate = {}
-        for (let item of filteredTasks) {
+        for (let item of filteredLogs) {
           let date = new Date(item.create_time)
           let itemDate = {
             year: date.getFullYear(),
@@ -109,12 +87,6 @@
           groupByDate[itemDate.year][itemDate.month][itemDate.date].push(item)
         }
         return groupByDate
-      },
-      active () {
-        return filters['active'](this.tasks).length
-      },
-      completed () {
-        return filters['completed'](this.tasks).length
       },
       visibility () {
         return this.$route.params.type
@@ -145,35 +117,31 @@
       }
     },
     methods: {
-      async addTask (e) {
-        let title = this.taskInput
+      async addLog (e) {
+        var title = this.logInput
         if (title.trim()) {
           Indicator.open()
-          await this.addTaskAsync({title, done: false, user_uid: this.$store.state.user.user.uid})
+          await this['log/addLogAsync']({title, done: false, user_uid: this.$store.state.user.user.uid})
           Indicator.close()
         }
-        this.taskInput = ''
+        this.logInput = ''
         this.$refs['header_input'].innerText = ''
         Toast('添加任务成功')
       },
       // Vuex store Mutations and Actions
-      ...mapMutations([
-        'toggleAll',
-        'clearCompleted'
-      ]),
       ...mapActions([
-        'initTasks',
-        'addTaskAsync',
-        'appendTasksAsync'
+        'log/initLogs',
+        'log/addLogAsync',
+        'log/appendLogsAsync'
       ]),
       async loadTop () {
-        await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
+        await this['log/initLogs'](`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
         this.currentShowDays = this.showDays
         this.allLoaded = false
         this.$refs.loadmore.onTopLoaded()
       },
       async loadBottom () {
-        await this.appendTasksAsync(`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
+        await this['log/appendLogsAsync'](`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
 //        if (res === '') this.allLoaded = true
         this.currentShowDays += this.loadMoreDays
         this.$refs.loadmore.onBottomLoaded()
@@ -186,11 +154,10 @@
       }
     },
     filters: {
-      pluralize: (n, w) => n === 1 ? w : (w + 's'),
-      namelize: s => filtersName[s]
+      pluralize: (n, w) => n === 1 ? w : (w + 's')
     },
     async created () {
-      await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
+      await this['log/initLogs'](`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
       this.ready = true
     }
   }
@@ -243,8 +210,8 @@
       /*background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#309990), to(#f7ba2a));*/
       /*background-color: #eeeeee;*/
       position: absolute;
+      bottom: 0px;
       top: 48px;
-      bottom: 48px;
       width: 100%;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
