@@ -31,7 +31,6 @@
           Toast('登录成功！')
           this.$router.push('/log')
         } catch (e) {
-          alert(e)
           Indicator.close()
           Toast(e.Message)
         }

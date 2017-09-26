@@ -76,7 +76,8 @@
     },
     computed: {
       done () {
-        return this.task.done === 1 || this.task.done === true
+        console.log(this.task.done)
+        return !!this.task.done
       }
     },
     methods: {

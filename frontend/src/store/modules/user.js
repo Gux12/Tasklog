@@ -15,7 +15,6 @@ export default {
     async initUserAsync ({commit, state}) {
       try {
         let user = await UserAPI.profile()
-        console.log(user)
         commit('initUser', user)
       } catch (e) {
         commit('initUser', null)
@@ -27,7 +26,6 @@ export default {
     },
     async login ({commit}, {username, pwd}) {
       let user = await UserAPI.login({username, pwd})
-      console.log(user)
       commit('initUser', user)
     }
   },

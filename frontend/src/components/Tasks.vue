@@ -50,8 +50,8 @@
     <mt-tabbar :value="visibility" :fixed="true" class="task_footer">
       <mt-tab-item v-for="(val, key) in filters" :id="key" :key="key" @click.native="$router.push('/task/' + key)">
         <span>{{ key | namelize }}
-          <mt-badge size="large" class="success" v-if="key === 'active' || key === 'all'">{{active}}</mt-badge>
-          <mt-badge size="large" class="error" v-else="key === 'completed'">{{completed}}</mt-badge>
+          <mt-badge size="large" type="success" v-if="key === 'active' || key === 'all'">{{active}}</mt-badge>
+          <mt-badge size="large" type="error" v-else="key === 'completed'">{{completed}}</mt-badge>
         </span>
       </mt-tab-item>
     </mt-tabbar>
@@ -289,12 +289,6 @@
     }
   }
 
-  .success {
-    background-color: $color-success;
-  }
 
-  .error {
-    background-color: $color-danger;
-  }
 
 </style>
