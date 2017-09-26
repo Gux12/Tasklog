@@ -16,8 +16,8 @@
     </div>
     <div class="time">
       <span v-text="'创建于' + new Date(task.create_time).toLocaleString()" class="create_time"></span>
-      <span v-show="task.done_time" v-text="'完成于' + new Date(task.done_time).toLocaleString()" class="done_time"></span>
-      <span v-show="task.done_time" v-text="timestampToStirng(task.create_time, task.done_time)"
+      <span v-show="task.done" v-text="'完成于' + new Date(task.done_time).toLocaleString()" class="done_time"></span>
+      <span v-show="task.done" v-text="timestampToStirng(task.create_time, task.done_time)"
             class="used_time"></span>
     </div>
     <mt-switch class="toggle" :value="done" @change="doneToggle"></mt-switch>
@@ -126,30 +126,30 @@
 </script>
 
 <style lang="scss">
+  @import "src/scss/color.scss";
   .task {
-    background-color: transparent;
     border-top: 1px solid rgba(0, 0, 0, 0.12);
     &.completed {
-      color: #999999;
+      color: $color-grey;
       & .mint-cell-title {
         text-decoration: line-through;
       }
       .time {
         .create_time {
           text-decoration: line-through;
-          background-color: #999999;
+          background-color: $color-grey;
         }
         .done_time {
           margin-top: 5px;
           margin-bottom: 5px;
-          background-color: #309990;
+          background-color: $color-success;
           padding: 5px 5px;
           border-radius: 5px;
           color: white;
         }
         .used_time {
           margin-bottom: 5px;
-          background-color: #309990;
+          background-color: $color-primary;
           padding: 5px 5px;
           border-radius: 5px;
           color: white;
@@ -188,7 +188,7 @@
       display: block;
       padding: 12px 16px;
       &:focus {
-        border: 3px solid #f7ba2a;
+        border: 2px solid $color-grey;
         box-shadow: none;
         border-radius: 0px;
         outline: none;
@@ -203,7 +203,7 @@
       margin-right: 20px;
       .create_time {
         margin-top: 5px;
-        background-color: brown;
+        background-color:  $color-danger;
         padding: 5px 5px;
         border-radius: 5px;
         color: white;

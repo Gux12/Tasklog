@@ -7,6 +7,8 @@
       </div>
       <mt-button type="primary" size="large" @click="login">登录</mt-button>
     </div>
+    <section class="login_section">
+    </section>
   </div>
 </template>
 <script>
@@ -38,25 +40,45 @@
   }
 </script>
 <style lang="scss" scoped>
+  @import 'src/scss/color.scss';
+
   .login {
-    background-color: #309990;
+    position: fixed;
+    .login_section {
+      background-color: $color-primary;
+      height: 100%;
+      position: relative;
+      /*&:before {*/
+        /*background-image: url(/static/img/banner-shape@2x.png);*/
+        /*background-size: 2880px 560px;*/
+        /*content: '';*/
+        /*opacity: 0.8;*/
+        /*background-repeat: no-repeat;*/
+        /*background-position: center bottom;*/
+        /*position: absolute;*/
+        /*width: 100%;*/
+        /*height: 35em;*/
+        /*bottom: 0;*/
+        /*left: 0;*/
+      /*}*/
+    }
     .login_form {
-      & :first-child {
-        border-radius: 4px 4px 0 0;
-      }
       & :last-child {
         border-radius: 0px 0px 4px 4px;
       }
       background-color: white;
       border-radius: 4px;
-      margin: 60px auto auto 20px;
-      width: calc(100% - 40px);
-      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08), 0 2px 2px 0 rgba(0, 0, 0, 0.16);
+      left: 1em;
+      right: 1em;
+      top: 5em;
+      position: absolute;
+      z-index: 1;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.10), 0 3px 2px 0 rgba(0, 0, 0, 0.16);
       .login_form_input {
         padding: 10px;
       }
       button {
-        background-color: rgba(#309990, .9);
+        background-color: $color-button;
       }
     }
   }

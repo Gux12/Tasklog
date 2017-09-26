@@ -1,15 +1,29 @@
 /* Transition */
-$all-transition: all .3s cubic-bezier(.645,.045,.355,1);
+$all-transition: all .3s cubic-bezier(.645, .045, .355, 1);
 $fade-transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
 $fade-linear-transition: opacity 200ms linear;
 $md-fade-transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1) 100ms, opacity 300ms cubic-bezier(0.23, 1, 0.32, 1) 100ms;
-$border-transition-base: border-color .2s cubic-bezier(.645,.045,.355,1);
-$color-transition-base: color .2s cubic-bezier(.645,.045,.355,1);
+$border-transition-base: border-color .2s cubic-bezier(.645, .045, .355, 1);
+$color-transition-base: color .2s cubic-bezier(.645, .045, .355, 1);
 
 /* Colors */
-$color-primary: #f7ba2a;
+@keyframes change_color {
+  from {
+    margin-left: -20%;
+  }
+  to {
+    margin-left: 100%;
+  }
+}
 
-$color-success: #13ce66;
-$color-warning: #309990;
-$color-danger: #ff4949;
+$color-primary: #0292b7;
+$color-success: #36b9ae;
+$color-warning: orange;
+$color-danger: brown;
 $color-info: #50bfff;
+
+/* Theme */
+$color-button: lighten($color-primary, 5%);
+$color-footer: #1E3D58;
+$color-body: #dee2ec;
+$color-grey: #999999;

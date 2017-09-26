@@ -1,13 +1,15 @@
 <template>
   <div class="app">
-    <mt-header :title="`${$store.getters['user/isAuthed']?$store.state.user.user.username+'\'s':''} TaskLog`" :fixed="true">
+    <mt-header :title="`${$store.getters['user/isAuthed']?$store.state.user.user.username+'\'s':''} TaskLog`"
+               :fixed="true" class="app_header">
       <router-link to="/log" slot="left">
-        <mt-button><img src="../src/assets/logo.png" height="30" width="30" slot="icon"></mt-button>
+        <mt-button><img src="../src/assets/tasklog.svg" height="30" width="30" slot="icon"></mt-button>
       </router-link>
       <mt-button slot='right' @click="logout" v-show="$store.getters['user/isAuthed']">退出</mt-button>
     </mt-header>
-    <mt-navbar :value="url" class="mt_navbar" v-show="$store.getters['user/isAuthed']">
-      <mt-tab-item v-for="(path,index) in paths" :id="path.path.split('/')[1]" :key="index" @click.native="$router.push(path.path)">
+    <mt-navbar :value="url" class="app_navbar" v-show="$store.getters['user/isAuthed']">
+      <mt-tab-item v-for="(path,index) in paths" :id="path.path.split('/')[1]" :key="index"
+                   @click.native="$router.push(path.path)">
         {{path.value}}
       </mt-tab-item>
     </mt-navbar>
@@ -41,12 +43,25 @@
   }
 </script>
 <style lang="scss" scoped>
+  .app_header {
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
+    z-index: 3;
+  }
+
+  .app_navbar {
+    top: 48px;
+    right: 0;
+    left: 0;
+    position: fixed;
+    z-index: 2;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
+  }
+
   .router_view {
     top: 84px;
     bottom: 0px;
     width: 100%;
     position: absolute;
-    background-color: white;
     &.full {
       top: 48px;
     }

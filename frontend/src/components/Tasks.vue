@@ -47,11 +47,11 @@
       </mt-loadmore>
     </section>
     <!-- footer -->
-    <mt-tabbar :value="visibility" :fixed="true">
+    <mt-tabbar :value="visibility" :fixed="true" class="task_footer">
       <mt-tab-item v-for="(val, key) in filters" :id="key" :key="key" @click.native="$router.push('/task/' + key)">
         <span>{{ key | namelize }}
-          <mt-badge size="large" type="error" v-if="key === 'active' || key === 'all'">{{active}}</mt-badge>
-          <mt-badge size="large" type="success" v-else="key === 'completed'">{{completed}}</mt-badge>
+          <mt-badge size="large" class="success" v-if="key === 'active' || key === 'all'">{{active}}</mt-badge>
+          <mt-badge size="large" class="error" v-else="key === 'completed'">{{completed}}</mt-badge>
         </span>
       </mt-tab-item>
     </mt-tabbar>
@@ -147,6 +147,10 @@
     methods: {
       async addTask (e) {
         let title = this.taskInput
+        if (title === '') {
+          Toast('任务为空')
+          return
+        }
         if (title.trim()) {
           Indicator.open()
           await this.addTaskAsync({title, done: false, user_uid: this.$store.state.user.user.uid})
@@ -236,7 +240,7 @@
         }
       }
       .header_btn {
-        background-color: lighten(#309990, 5%);
+        background-color: lighten($color-primary, 5%);
       }
     }
     .main {
@@ -257,7 +261,7 @@
             margin: 0;
             font-size: 1.2rem;
             padding: 5px 10px;
-            color: #999999;
+            color: $color-grey;
           }
           .main_date {
             color: #333;
@@ -268,7 +272,7 @@
               color: black;
               width: 100%;
               text-align: right;
-              color: #999999;
+              color: $color-grey;
             }
             .main_tasks {
               width: calc(100% - 20px);
@@ -279,6 +283,18 @@
         }
       }
     }
+    .task_footer{
+      box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+    }
+  }
+
+  .success {
+    background-color: $color-success;
+  }
+
+  .error {
+    background-color: $color-danger;
   }
 
 </style>

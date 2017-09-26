@@ -119,6 +119,10 @@
     methods: {
       async addLog (e) {
         var title = this.logInput
+        if (title === '') {
+          Toast('工作为空')
+          return
+        }
         if (title.trim()) {
           Indicator.open()
           await this['log/addLogAsync']({title, done: false, user_uid: this.$store.state.user.user.uid})
@@ -126,7 +130,7 @@
         }
         this.logInput = ''
         this.$refs['header_input'].innerText = ''
-        Toast('添加任务成功')
+        Toast('添加工作成功')
       },
       // Vuex store Mutations and Actions
       ...mapActions([
@@ -203,7 +207,7 @@
         }
       }
       .header_btn {
-        background-color: lighten(#309990, 5%);
+        background-color: lighten($color-primary, 5%);
       }
     }
     .main {
@@ -224,7 +228,7 @@
             margin: 0;
             font-size: 1.2rem;
             padding: 5px 10px;
-            color: #999999;
+            color: $color-grey;
           }
           .main_date {
             color: #333;
@@ -235,7 +239,7 @@
               color: black;
               width: 100%;
               text-align: right;
-              color: #999999;
+              color: $color-grey;
             }
             .main_tasks {
               width: calc(100% - 20px);

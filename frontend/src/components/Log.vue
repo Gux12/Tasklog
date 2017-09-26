@@ -109,8 +109,8 @@
 </script>
 
 <style lang="scss">
+  @import 'src/scss/color.scss';
   .log {
-    background-color: transparent;
     border-top: 1px solid rgba(0, 0, 0, 0.12);
     .title {
       position: relative;
@@ -143,7 +143,7 @@
       display: block;
       padding: 12px 16px;
       &:focus {
-        border: 3px solid #f7ba2a;
+        border: 2px solid $color-grey;
         box-shadow: none;
         border-radius: 0px;
         outline: none;
@@ -158,7 +158,7 @@
       margin-right: 20px;
       .create_time {
         margin-top: 5px;
-        background-color: #309990;
+        background-color: $color-primary;
         padding: 5px 5px;
         border-radius: 5px;
         color: white;
