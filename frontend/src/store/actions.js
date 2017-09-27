@@ -3,8 +3,8 @@ import * as TaskAPI from '@/api/task'
 const actions = {
   async initTasks ({commit, state}, options) {
     let tasks = await TaskAPI.findAllTask('/' + options)
-    let countActive = await TaskAPI.count('/done?value=0')
-    let countCompleted = await TaskAPI.count('/done?value=1')
+    let countActive = await TaskAPI.count('/done?value=0/user_uid?value=' + state.user.user.uid)
+    let countCompleted = await TaskAPI.count('/done?value=1/user_uid?value=' + state.user.user.uid)
     commit('setCount', {countActive, countCompleted})
     commit('clearTasks')
     commit('appendTasks', {tasks})
