@@ -1,5 +1,5 @@
 <template>
-  <section class="taskapp" v-loading="!ready">
+  <section class="taskapp">
     <!-- header -->
     <header class="header">
       <span class="header_label">任务</span>
@@ -50,8 +50,8 @@
     <mt-tabbar :value="visibility" :fixed="true" class="task_footer">
       <mt-tab-item v-for="(val, key) in filters" :id="key" :key="key" @click.native="$router.push('/task/' + key)">
         <span>{{ key | namelize }}
-          <mt-badge size="large" type="success" v-if="key === 'active' || key === 'all'">{{active}}</mt-badge>
-          <mt-badge size="large" type="error" v-else="key === 'completed'">{{completed}}</mt-badge>
+          <mt-badge size="large" type="error" v-if="key === 'active' || key === 'all'">{{active}}</mt-badge>
+          <mt-badge size="large" type="success" v-else="key === 'completed'">{{completed}}</mt-badge>
         </span>
       </mt-tab-item>
     </mt-tabbar>
@@ -61,7 +61,7 @@
 <script>
   import { mapMutations, mapActions } from 'vuex'
   import Task from '@/components/Task.vue'
-  import { Toast, Indicator } from 'mint-ui'
+  import { Toast } from 'mint-ui'
 
   const filters = {
     all: tasks => tasks,
@@ -111,10 +111,10 @@
         return groupByDate
       },
       active () {
-        return filters['active'](this.tasks).length
+        return this.$store.state.count.countActive
       },
       completed () {
-        return filters['completed'](this.tasks).length
+        return this.$store.state.count.countCompleted
       },
       visibility () {
         return this.$route.params.type
@@ -152,13 +152,10 @@
           return
         }
         if (title.trim()) {
-          Indicator.open()
           await this.addTaskAsync({title, done: false, user_uid: this.$store.state.user.user.uid})
-          Indicator.close()
         }
         this.taskInput = ''
         this.$refs['header_input'].innerText = ''
-        Toast('添加任务成功')
       },
       // Vuex store Mutations and Actions
       ...mapMutations([
@@ -181,12 +178,6 @@
 //        if (res === '') this.allLoaded = true
         this.currentShowDays += this.loadMoreDays
         this.$refs.loadmore.onBottomLoaded()
-      }
-    },
-    directives: {
-      loading (el, binding, {context}) {
-        if (!context.ready) Indicator.open()
-        else Indicator.close()
       }
     },
     filters: {

@@ -76,7 +76,6 @@
     },
     computed: {
       done () {
-        console.log(this.task.done)
         return !!this.task.done
       }
     },

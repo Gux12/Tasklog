@@ -12,8 +12,6 @@
   </div>
 </template>
 <script>
-  import { Toast, Indicator } from 'mint-ui'
-
   export default {
     data () {
       return {
@@ -24,16 +22,8 @@
     methods: {
       async login () {
         let {username, pwd} = this
-        Indicator.open()
-        try {
-          await this.$store.dispatch('user/login', {username, pwd})
-          Indicator.close()
-          Toast('登录成功！')
-          this.$router.push('/log')
-        } catch (e) {
-          Indicator.close()
-          Toast(e.Message)
-        }
+        await this.$store.dispatch('user/login', {username, pwd})
+        this.$router.push('/log')
       }
     }
   }
@@ -48,17 +38,17 @@
       height: 100%;
       position: relative;
       /*&:before {*/
-        /*background-image: url(/static/img/banner-shape@2x.png);*/
-        /*background-size: 2880px 560px;*/
-        /*content: '';*/
-        /*opacity: 0.8;*/
-        /*background-repeat: no-repeat;*/
-        /*background-position: center bottom;*/
-        /*position: absolute;*/
-        /*width: 100%;*/
-        /*height: 35em;*/
-        /*bottom: 0;*/
-        /*left: 0;*/
+      /*background-image: url(/static/img/banner-shape@2x.png);*/
+      /*background-size: 2880px 560px;*/
+      /*content: '';*/
+      /*opacity: 0.8;*/
+      /*background-repeat: no-repeat;*/
+      /*background-position: center bottom;*/
+      /*position: absolute;*/
+      /*width: 100%;*/
+      /*height: 35em;*/
+      /*bottom: 0;*/
+      /*left: 0;*/
       /*}*/
     }
     .login_form {

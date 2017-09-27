@@ -113,6 +113,53 @@ let Restful = function (keys, db, tableName) {
     console.log('UPDATE ' + tableName + setStirng + 'WHERE uid = ?', paramVal)
     db.run('UPDATE ' + tableName + setStirng + 'WHERE uid = ?', paramVal, cb)
   }
+  // 计算条数
+  this.count = function (options, cb) {
+    // 查询返回升序降序选项
+    let orderString = ' ORDER BY '
+    if (options.orders !== undefined) {
+      let orders = options.orders
+      let newOrders = []
+      for (let order of orders) {
+        let retStr = order.order ? (order.key + ' ' + order.order) : ''
+        if (retStr !== '') newOrders.push(retStr)
+      }
+      if (newOrders.length) {
+        newOrders.map(function (order, index) {
+          orderString += (index === 0 || order === '' ? '' : ', ') + order
+        })
+      } else {
+        orderString = ''
+      }
+    }
+    // 查询范围选项
+    let scaleString = ' WHERE '
+    if (options.scales !== undefined) {
+      let scales = options.scales
+      let newScales = []
+      for (let scale of scales) {
+        let retStr
+        if (scale.value !== null) {
+          retStr = `${scale.key}=${scale.value}`
+        } else {
+          retStr = (scale.start !== null ? (scale.key + ' >= ' + scale.start) : '') +
+            ((scale.start === null || scale.end === null) ? '' : ' AND ') +
+            (scale.end !== null ? (scale.key + ' <= ' + scale.end) : '')
+        }
+        if (retStr !== '') newScales.push(retStr)
+      }
+
+      if (newScales.length) {
+        newScales.map(function (scale, index) {
+          scaleString += (index === 0 ? '' : ' AND ') + scale
+        })
+      } else {
+        scaleString = ''
+      }
+    }
+    console.log('SELECT count(*) FROM ' + tableName + scaleString + orderString)
+    db.all('SELECT count(*) FROM ' + tableName + scaleString + orderString, cb)
+  }
 }
 
 module.exports = Restful

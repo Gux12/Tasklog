@@ -13,7 +13,7 @@ router.post('/login',
         user.sessionViews = req.session.views
         user.sessionID = req.sessionID
         req.session.user = user
-        res.send({ResultCode: 0, Record: user})
+        res.send({ResultCode: 0, Record: user, Message: '登录成功'})
       }
     })
   })
@@ -21,15 +21,15 @@ router.post('/login',
 router.post('/logout', function (req, res) {
   req.session.destroy(function (err) {
     // cannot access session here
-    if (err) res.send({ResultCode: 1, Record: err})
-    else res.send({ResultCode: 0, Record: null})
+    if (err) res.send({ResultCode: 1, Record: err, Message: '登出失败'})
+    else res.send({ResultCode: 0, Record: null, Message: '登出成功'})
   })
 })
 
 router.post('/profile', function (req, res, next) {
   if (req.session.user) {
     var user = req.session.user
-    res.send({ResultCode: 0, Record: user})
+    res.send({ResultCode: 0, Record: user, Message: '获取用户信息成功'})
   } else {
     res.send({ResultCode: 1, Record: null, Message: '未登录'})
   }
