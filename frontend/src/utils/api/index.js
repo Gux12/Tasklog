@@ -1,5 +1,6 @@
 import * as http from './http'
-import { Toast, Indicator } from 'mint-ui'
+import { Indicator } from 'mint-ui'
+import { Notification } from 'element-ui'
 
 export async function get (url, data) {
   Indicator.open()
@@ -57,13 +58,16 @@ function handleError (e) {
   if (e.ResultCode === 1) {
     error = e.Message
     if (error) {
-      Toast({
+      Notification.error({
         message: error,
         duration: 1000
       })
     }
   } else {
-    Toast(error)
+    Notification.error({
+      message: error['message'],
+      duration: 1000
+    })
   }
   Indicator.close()
 }
@@ -77,9 +81,11 @@ export function handleResponse (resp) {
     console.warn(resp.config.method, resp.config.url, resp.config.params, resp.config.data, resp.data)
     throw resp.data
   }
-  Toast({
-    message: resp.data.Message,
-    duration: 1000
-  })
+  if (resp.data.Message) {
+    Notification.success({
+      message: resp.data.Message,
+      duration: 1000
+    })
+  }
   return resp.data.Record
 }

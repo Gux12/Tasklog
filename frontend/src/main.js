@@ -5,13 +5,10 @@ import App from './App'
 import store from './store'
 import router from './router'
 // vendor
-// import ElementUI from 'element-ui'
-// import '@/scss/theme/index.css'
 import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
 import '@/scss/main.scss'
 // 全局中间件
-// Vue.use(ElementUI)
 Vue.use(MintUI)
 
 Vue.config.productionTip = false
@@ -22,5 +19,5 @@ new Vue({
   store,
   router,
   template: '<App/>',
-  components: { App }
+  components: {App}
 })

@@ -66,7 +66,7 @@ router.beforeEach(async (to, from, next) => {
     await store.dispatch('user/initUserAsync')
     flag++
   }
-  console.log(`from '${from.path}' to '${to.path}'`)
+  // console.log(`from '${from.path}' to '${to.path}'`)
   if (store.getters['user/isAuthed']) {
     if (to.path === '/login') next(false)
     else next()
