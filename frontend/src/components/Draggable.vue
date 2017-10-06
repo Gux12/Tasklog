@@ -14,9 +14,6 @@
 </template>
 <script>
   import debounce from 'lodash/debounce'
-  import $ from 'jquery'
-
-  require('jquery-ui')
 
   export default {
     data () {
