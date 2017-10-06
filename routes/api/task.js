@@ -9,6 +9,22 @@ const options = {
   scales: []
 }
 
+router.use(function (req, res, next) {
+  console.log('经过路由/task')
+  if (req.session.user) {
+    let user = req.session.user
+    options.scales.push({
+      key: 'user_uid',
+      start: '',
+      end: '',
+      value: user.uid
+    })
+    next()
+  } else {
+    res.send({ResultCode: 1, Record: null, Message: '未登录'})
+  }
+})
+
 // 查询所有的任务
 router.get('/list', function (req, res, next) {
   DB.task.findAll({
@@ -49,14 +65,16 @@ function convert_options (req, res, next) {
       let json = qs.parse(url.split('?')[1])
       console.log(json)
       let KEY = url.split('?')[0]
-      for (let key1 in resObj) {
-        for (let key2 in resObj[key1]) {
-          if (key2 === 'key') resObj[key1][key2] = KEY
-          else {
-            resObj[key1][key2] = json[key2] ? json[key2] : null
+      if (KEY !== 'user_uid') {
+        for (let key1 in resObj) {
+          for (let key2 in resObj[key1]) {
+            if (key2 === 'key') resObj[key1][key2] = KEY
+            else {
+              resObj[key1][key2] = json[key2] ? json[key2] : null
+            }
           }
+          options[key1 + 's'].push(resObj[key1])
         }
-        options[key1 + 's'].push(resObj[key1])
       }
     }
   }
@@ -113,12 +131,12 @@ router.route('/item/:task_id')
     if (req.body.done === true) {
       req.body.done_time = new Date().getTime()
     } else {
-      req.body.done_time = null
+      // req.body.done_time = null
     }
     DB.task.modify(req.params.task_id, req.body, function (err, data) {
       if (!err) {
         DB.task.find('uid', req.params.task_id, function (err, data) {
-          if (!err) res.send({ResultCode: 0, Record: data, Message: `修改任务成功`})
+          if (!err) res.send({ResultCode: 0, Record: data, Message: `获取修改任务成功`})
           else res.send({ResultCode: 1, Record: err, Message: `获取修改任务失败`})
         })
       }

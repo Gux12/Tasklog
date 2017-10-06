@@ -26,13 +26,17 @@ const router = new Router({
       component: Login
     },
     {
-      path: '/task/:type',
+      path: '/task/:type/:tags',
       name: 'Tasks',
       component: Tasks
     },
     {
+      path: '/task/:type',
+      redirect: '/task/active/全部'
+    },
+    {
       path: '/task',
-      redirect: '/task/active'
+      redirect: '/task/active/全部'
     },
     {
       path: '/log',

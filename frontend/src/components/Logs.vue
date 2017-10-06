@@ -125,7 +125,7 @@
         }
         if (title.trim()) {
           Indicator.open()
-          await this['log/addLogAsync']({title, done: false, user_uid: this.$store.state.user.user.uid})
+          await this['log/addLogAsync']({title, done: false})
           Indicator.close()
         }
         this.logInput = ''
@@ -139,13 +139,13 @@
         'log/appendLogsAsync'
       ]),
       async loadTop () {
-        await this['log/initLogs'](`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
+        await this['log/initLogs'](`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}`)
         this.currentShowDays = this.showDays
         this.allLoaded = false
         this.$refs.loadmore.onTopLoaded()
       },
       async loadBottom () {
-        await this['log/appendLogsAsync'](`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
+        await this['log/appendLogsAsync'](`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}`)
 //        if (res === '') this.allLoaded = true
         this.currentShowDays += this.loadMoreDays
         this.$refs.loadmore.onBottomLoaded()
@@ -161,7 +161,7 @@
       pluralize: (n, w) => n === 1 ? w : (w + 's')
     },
     async created () {
-      await this['log/initLogs'](`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
+      await this['log/initLogs'](`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}`)
       this.ready = true
     }
   }

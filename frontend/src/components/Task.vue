@@ -1,40 +1,25 @@
 <template>
-  <mt-cell-swipe :right="rightBtn" :class="{ completed: done, editing: editing, task: true}">
-    <div slot="title">
-      <span class="title" v-show="!editing" @click="editing = true">{{task.title}}</span>
-      <textarea class="edit"
-           contenteditable="true"
-           v-show="editing"
-           v-focus="editing"
-           :value="task.title"
-           @keyup.enter="doneEdit"
-           @keyup.esc="cancelEdit"
-           @touchstart.stop
-           @touchmove.stop
-           @blur="doneEdit">
-      </textarea>
-    </div>
-    <div class="time">
-      <span v-text="'创建于' + new Date(task.create_time).toLocaleString()" class="create_time"></span>
-      <span v-show="task.done" v-text="'完成于' + new Date(task.done_time).toLocaleString()" class="done_time"></span>
-      <span v-show="task.done" v-text="timestampToStirng(task.create_time, task.done_time)"
-            class="used_time"></span>
-    </div>
-    <mt-switch class="toggle" :value="done" @change="doneToggle"></mt-switch>
-  </mt-cell-swipe>
+  <div>
+    <mt-cell-swipe :right="rightBtn" :class="{ completed: done, task: true}">
+      <div slot="title">
+        <span class="title">
+          <span v-for="tag in task.tags"
+                :key="tag.text"
+                class="tag"
+                :style="{backgroundColor:tag.color,color:'#fff'}">{{tag.text}}</span> {{task.tagsFree}}</span>
+      </div>
+      <mt-switch class="toggle" :value="done" @change="doneToggle" @click.native.stop></mt-switch>
+    </mt-cell-swipe>
+  </div>
 </template>
 
 <script>
-  import { mapMutations, mapActions } from 'vuex'
-  import { Indicator } from 'mint-ui'
-
-  let Hammer = require('hammerjs')
+  import { mapActions } from 'vuex'
   export default {
     name: 'Task',
     props: ['task'],
     data () {
       return {
-        editing: false,
         rightBtn: [
           {
             content: '删除',
@@ -46,32 +31,12 @@
             },
             handler: () => this.$messagebox.confirm('确定执行此操作?').then(async action => {
               let {task} = this
-              Indicator.open()
               await this.deleteTaskAsync({task})
-              Indicator.close()
             }).catch(err => {
               err
             })
           }
         ]
-      }
-    },
-    directives: {
-      focus: function (el, {value}, {context}) {
-        if (value) {
-          context.$nextTick(() => {
-            el.focus()
-          })
-        }
-      },
-      press: {
-        bind: function (el, {arg, value}, {context}) {
-          let mc = new Hammer.Manager(el)
-          mc.add(new Hammer.Press({time: arg}))
-          mc.on('press', function () {
-            value(el)
-          })
-        }
       }
     },
     computed: {
@@ -80,46 +45,14 @@
       }
     },
     methods: {
-      ...mapMutations([]),
       ...mapActions([
         'deleteTaskAsync',
-        'editTaskAsync',
         'toggleTaskAsync'
       ]),
-      async doneToggle (e) {
-        Indicator.open()
+      doneToggle (e) {
         const {task} = this
-        await this.toggleTaskAsync({task})
-        Indicator.close()
-      },
-      doneEdit (e) {
-        const title = e.target.value.trim()
-        const {task} = this
-        if (!title) {
-          this.deleteTaskAsync({
-            task
-          })
-        } else if (this.editing) {
-          this.editTaskAsync({
-            task,
-            title
-          })
-          this.editing = false
-        }
-      },
-      cancelEdit (e) {
-        e.target.value = this.task.title
-        this.editing = false
-      },
-      timestampToStirng (start, end) {
-        let timediff = parseInt((end - start) / 1000)
-        let day = parseInt(timediff / 86400)
-        let remain = timediff % 86400
-        let hour = parseInt(remain / 3600)
-        remain = remain % 3600
-        let min = parseInt(remain / 60)
-        let sec = remain % 60
-        return `耗时${day !== 0 ? day + '天' : ''}${hour !== 0 ? hour + '时' : ''}${min !== 0 ? min + '分' : ''}${sec !== 0 ? sec + '秒' : ''}`
+        console.log(this)
+        this.toggleTaskAsync({task})
       }
     }
   }
@@ -127,33 +60,13 @@
 
 <style lang="scss">
   @import "src/scss/color.scss";
+
   .task {
     border-top: 1px solid rgba(0, 0, 0, 0.12);
     &.completed {
       color: $color-grey;
       & .mint-cell-title {
         text-decoration: line-through;
-      }
-      .time {
-        .create_time {
-          text-decoration: line-through;
-          background-color: $color-grey;
-        }
-        .done_time {
-          margin-top: 5px;
-          margin-bottom: 5px;
-          background-color: $color-success;
-          padding: 5px 5px;
-          border-radius: 5px;
-          color: white;
-        }
-        .used_time {
-          margin-bottom: 5px;
-          background-color: $color-primary;
-          padding: 5px 5px;
-          border-radius: 5px;
-          color: white;
-        }
       }
     }
     .title {
@@ -171,43 +84,13 @@
       font-smoothing: antialiased;
       display: block;
       padding: 12px 16px;
-      word-break: break-all;
-    }
-    .edit {
-      position: relative;
-      margin: 0;
-      width: 90%;
-      font-size: 1rem;
-      font-family: inherit;
-      font-weight: inherit;
-      line-height: 1.4em;
-      color: inherit;
-      padding: 6px;
-      box-sizing: border-box;
-      font-smoothing: antialiased;
-      display: block;
-      padding: 12px 16px;
-      &:focus {
-        border: 2px solid $color-grey;
-        box-shadow: none;
-        border-radius: 0px;
-        outline: none;
-        overflow-wrap: break-word;
+      word-break: normal;
+      .tag {
+        padding: 5px;
+        text-align: center;
+        border-radius: 4px;
       }
     }
-    .time {
-      text-align: center;
-      display: flex;
-      flex-flow: column;
-      font-size: 0.8rem;
-      margin-right: 20px;
-      .create_time {
-        margin-top: 5px;
-        background-color:  $color-danger;
-        padding: 5px 5px;
-        border-radius: 5px;
-        color: white;
-      }
-    }
+
   }
 </style>

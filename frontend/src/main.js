@@ -8,8 +8,10 @@ import router from './router'
 import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
 import '@/scss/main.scss'
+import Icon from 'vue-awesome/components/Icon'
 // 全局中间件
 Vue.use(MintUI)
+Vue.component('icon', Icon)
 
 Vue.config.productionTip = false
 

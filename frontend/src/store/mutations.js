@@ -35,8 +35,10 @@ export const mutations = {
       state.count.countCompleted--
     }
   },
-  editTask (state, {task, title}) {
-    task.title = title
+  editTask (state, {task, title, tags, tagsFree}) {
+    state.tasks[state.tasks.indexOf(task)].title = title
+    state.tasks[state.tasks.indexOf(task)].tags = tags
+    state.tasks[state.tasks.indexOf(task)].tagsFree = tagsFree
   },
   setCount (state, {countActive, countCompleted}) {
     state.count.countActive = countActive

@@ -6,10 +6,26 @@
       <div contenteditable="true" class="header_input" @input="taskInput = arguments[0].target.innerText"
            placeholder="创建任务吧！" ref="header_input">
       </div>
+      <!--<TagInput></TagInput>-->
       <mt-button type="primary" @click="addTask" class="header_btn">提交</mt-button>
     </header>
-    <!-- main section -->
+    <!--main section-->
     <section class="main">
+      <Draggable :zIndex="4000" :left="20" :top="20" v-show="doneType === 'active'"
+                 style="display: flex;align-items: center;flex-flow: column">
+        <div class="tags_btn"
+             @click="showTags = !showTags">
+        </div>
+        <div v-show="showTags" class="tags_connector">|||</div>
+        <div :class="['tags_wrapper',showTags?'':'hidden']">
+          <div :class="['tags_tag',~tagsType.indexOf(tag.text)?'selected':'']" size="small" v-for="tag in tagsArray"
+               :key="tag.text"
+               @click="$router.push('/task/' + $route.params.type + '/' + tag.text)">
+            <span>{{tag.text}}</span>
+            <mt-badge size="small" type="error">{{tag.count}}</mt-badge>
+          </div>
+        </div>
+      </Draggable>
       <mt-loadmore
         style="min-height: 100%"
         :top-method="loadTop"
@@ -36,7 +52,9 @@
               <section class="main_tasks">
                 <Task
                   v-for="(task, index) in filteredTasks[year][month][date]"
-                  :key="task.title" :task="task"></Task>
+                  @click.native="popupVisible = true;selectedTask = task"
+                  :key="task.title" :task="task">
+                </Task>
               </section>
             </section>
           </section>
@@ -47,21 +65,35 @@
       </mt-loadmore>
     </section>
     <!-- footer -->
-    <mt-tabbar :value="visibility" :fixed="true" class="task_footer">
-      <mt-tab-item v-for="(val, key) in filters" :id="key" :key="key" @click.native="$router.push('/task/' + key)">
+    <mt-tabbar :value="doneType" :fixed="true" class="task_footer">
+      <mt-tab-item v-for="(val, key) in filters" :id="key" :key="key"
+                   @click.native="$router.push('/task/' + key + '/' + $route.params.tags)">
         <span>{{ key | namelize }}
           <mt-badge size="large" type="error" v-if="key === 'active' || key === 'all'">{{active}}</mt-badge>
           <mt-badge size="large" type="success" v-else="key === 'completed'">{{completed}}</mt-badge>
         </span>
       </mt-tab-item>
     </mt-tabbar>
+    <mt-popup
+      v-model="popupVisible"
+      style="width: 100%;height: 100%;background-color: white"
+      position="right">
+      <mt-header title="任务详情">
+        <mt-button icon="back" @click="popupVisible = false" slot="left">返回</mt-button>
+      </mt-header>
+      <TaskEdit :task="selectedTask"></TaskEdit>
+    </mt-popup>
   </section>
 </template>
 
 <script>
   import { mapMutations, mapActions } from 'vuex'
   import Task from '@/components/Task.vue'
+  import TaskEdit from '@/components/TaskEdit.vue'
+  import TagInput from '@/components/TagInput.vue'
   import { Toast } from 'mint-ui'
+  import 'vue-awesome/icons/pencil'
+  import Draggable from './Draggable.vue'
 
   const filters = {
     all: tasks => tasks,
@@ -75,32 +107,84 @@
     completed: '已完成'
   }
 
+  //  const inputCheck = function (title) {
+  //    let tags = title.match(/#([^\s#]+)#/g)
+  //    if (tags != null) {
+  //      for (let index in tags) {
+  //        tags[index] = tags[index].match(/#([^\s#]+)#/)[1]
+  //      }
+  //    }
+  //  }
+
   export default {
-    components: {Task},
+    components: {Task, TaskEdit, TagInput, Draggable},
     data () {
       return {
         filters: filters,
         taskInput: '',
-        showDays: 4,
-        loadMoreDays: 2,
-        currentShowDays: 4,
+        showDays: 5,
+        loadMoreDays: 3,
+        currentShowDays: 5,
         ready: false,
-        allLoaded: false
+        allLoaded: false,
+        popupVisible: false,
+        selectedTask: null,
+        showTags: false
       }
     },
     computed: {
       tasks () {
-        return this.$store.state.tasks
+        let tasks = this.$store.state.tasks
+        return tasks
+      },
+      doneType () {
+        return this.$route.params.type
+      },
+      tagsType () {
+        return this.$route.params.tags.split('_')
+      },
+      tagsArray () {
+        let tagsArray = [{text: '全部', count: 0}, {text: '无标签', count: 0}]
+        let filteredTasks = filters[this.doneType](this.tasks)
+        for (let task of filteredTasks) {
+          tagsArray.filter(tag => tag.text === '全部')[0].count++
+          if (task.tags) {
+            for (let tag of task.tags) {
+              if (tagsArray.filter(_tag => _tag.text === tag.text).length) tagsArray.filter(_tag => _tag.text === tag.text)[0].count++
+              else {
+                tagsArray.push({text: tag.text, count: 1})
+              }
+            }
+          } else {
+            tagsArray.filter(tag => tag.text === '无标签')[0].count++
+          }
+        }
+        return tagsArray
+      },
+      // 过滤tags的过滤函数
+      filterTags () {
+        let filterTags = {}
+        for (let tag of this.tagsType) {
+          filterTags[tag] = tasks => tasks.filter(task => task.tags !== null && task.tags.filter(_tag => _tag.text === tag).length !== 0)
+        }
+        filterTags['全部'] = tasks => tasks
+        filterTags['无标签'] = tasks => tasks.filter(task => task.tags === null)
+        return filterTags
       },
       filteredTasks () {
-        let filteredTasks = filters[this.visibility](this.tasks)
+        let filteredTasks = filters[this.doneType](this.tasks)
+        if (this.tagsType !== null) {
+          for (let tag of this.tagsType) {
+            filteredTasks = this.filterTags[tag](filteredTasks)
+          }
+        }
         let groupByDate = {}
         for (let item of filteredTasks) {
           let date = new Date(item.create_time)
           let itemDate = {
             year: date.getFullYear(),
-            month: date.getMonth() + 1,
-            date: date.getDate(),
+            month: (Array(2).join(0) + (date.getMonth() + 1)).slice(-2),
+            date: (Array(2).join(0) + (date.getDate() + 1)).slice(-2),
             day: date.getDay() + 1
           }
           if (groupByDate[itemDate.year] === undefined) groupByDate[itemDate.year] = {}
@@ -116,9 +200,6 @@
       completed () {
         return this.$store.state.count.countCompleted
       },
-      visibility () {
-        return this.$route.params.type
-      },
       dateToday () {
         let dateToday = new Date()
         let timestamp = dateToday.getTime()
@@ -133,8 +214,8 @@
           let date = new Date(dateToday.getTime() - i * 86400000)
           let itemDate = {
             year: date.getFullYear(),
-            month: date.getMonth() + 1,
-            date: date.getDate(),
+            month: (Array(2).join(0) + (date.getMonth() + 1)).slice(-2),
+            date: (Array(2).join(0) + (date.getDate() + 1)).slice(-2),
             day: date.getDay() + 1
           }
           if (timeLine[itemDate.year] === undefined) timeLine[itemDate.year] = {}
@@ -152,7 +233,7 @@
           return
         }
         if (title.trim()) {
-          await this.addTaskAsync({title, done: false, user_uid: this.$store.state.user.user.uid})
+          await this.addTaskAsync({title, done: false})
         }
         this.taskInput = ''
         this.$refs['header_input'].innerText = ''
@@ -168,13 +249,13 @@
         'appendTasksAsync'
       ]),
       async loadTop () {
-        await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
+        await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}`)
         this.currentShowDays = this.showDays
         this.allLoaded = false
         this.$refs.loadmore.onTopLoaded()
       },
       async loadBottom () {
-        await this.appendTasksAsync(`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
+        await this.appendTasksAsync(`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}`)
 //        if (res === '') this.allLoaded = true
         this.currentShowDays += this.loadMoreDays
         this.$refs.loadmore.onBottomLoaded()
@@ -185,7 +266,7 @@
       namelize: s => filtersName[s]
     },
     async created () {
-      await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}/user_uid?value=${this.$store.state.user.user.uid}`)
+      await this.initTasks(`create_time?end=${this.dateToday.getTime()}&start=${this.dateToday.getTime() - this.showDays * 86400000}`)
       this.ready = true
     }
   }
@@ -234,11 +315,57 @@
         background-color: lighten($color-primary, 5%);
       }
     }
+    .tags_btn {
+      border-radius: 30px;
+      width: 60px;
+      height: 60px;
+      border: $color-primary 5px solid;
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+      &:after {
+        font-size: 12px;
+        font-weight: bolder;
+        color: $color-primary;
+        content: '(ง •̀_•́)ง';
+      }
+    }
+    .tags_connector {
+      color: white;
+      font-weight: bolder;
+      border: 2px solid $color-primary;
+      background-color: $color-primary;
+    }
+    .tags_wrapper {
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+      z-index: 3000;
+      border: 4px solid $color-primary;
+      max-height: 400px;
+      overflow: auto;
+      &.hidden {
+        max-height: 0;
+        border: 4px solid transparent;
+        box-shadow: none;
+        overflow: hidden;
+      }
+      .tags_tag {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: white;
+        padding: 5px 10px;
+        &.selected {
+          color: white;
+          background-color: $color-primary;
+        }
+      }
+    }
     .main {
-      /*background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#309990), to(#f7ba2a));*/
-      /*background-color: #eeeeee;*/
       position: absolute;
-      top: 48px;
+      top: 52px;
       bottom: 48px;
       width: 100%;
       overflow-y: auto;
@@ -257,7 +384,6 @@
           .main_date {
             color: #333;
             h1 {
-              /*float: right;*/
               margin: 0;
               font-size: 1rem;
               color: black;
@@ -274,12 +400,11 @@
         }
       }
     }
-    .task_footer{
+    .task_footer {
       box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
       z-index: 1000;
     }
   }
-
 
 
 </style>
