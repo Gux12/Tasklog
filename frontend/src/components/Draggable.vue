@@ -95,9 +95,6 @@
       this.parentLeft = 0
       console.log(window.innerHeight, window.innerWidth)
       // this size
-      console.log($(this.$refs.draggable).width(), $(this.$refs.draggable).height())
-      console.log($(this.$refs.draggable).innerWidth(), $(this.$refs.draggable).innerHeight())
-      console.log($(this.$refs.draggable).outerWidth(), $(this.$refs.draggable).outerHeight())
       this.height = this.$refs.draggable.clientHeight
       console.log(this.height)
       this.width = this.$refs.draggable.clientWidth
