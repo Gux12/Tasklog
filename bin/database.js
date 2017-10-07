@@ -1,8 +1,8 @@
 var fs = require('fs')
 var path = require('path')
 
-if (!fs.existsSync(path.join(__dirname, 'databases'))) {
-  fs.mkdirSync(path.join(__dirname, 'databases'), function (err) {
+if (!fs.existsSync(path.join(__dirname, '../databases'))) {
+  fs.mkdirSync(path.join(__dirname, '../databases'), function (err) {
     if (err) {
       console.log(err)
       return
