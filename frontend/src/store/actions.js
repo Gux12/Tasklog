@@ -1,48 +1,43 @@
 import * as TaskAPI from '@/api/task'
 import { getRandomColor } from '@/utils/color'
 
+let preProcess = async tasks => {
+  for (let task of tasks) {
+    let tags = task.title.match(/#([^#]+)#/g)
+    if (tags != null) {
+      for (let index in tags) {
+        tags[index] = {
+          text: tags[index].match(/#([^#]+)#/)[1],
+          color: await getRandomColor(tags[index].match(/#([^#]+)#/)[1])
+        }
+      }
+    }
+    task.tags = tags
+    task.tagsFree = task.title.replace(/#([^#]+)#/g, '')
+  }
+  return tasks
+}
+
 const actions = {
   async initTasks ({commit, state}, options) {
     let tasks = await TaskAPI.findAllTask('/' + options)
     let countActive = await TaskAPI.count('/done?value=0')
     let countCompleted = await TaskAPI.count('/done?value=1')
-    for (let task of tasks) {
-      let tags = task.title.match(/#([^#]+)#/g)
-      if (tags != null) {
-        for (let index in tags) {
-          tags[index] = {
-            text: tags[index].match(/#([^#]+)#/)[1],
-            color: await getRandomColor(tags[index].match(/#([^#]+)#/)[1])
-          }
-        }
-      }
-      task.tags = tags
-      task.tagsFree = task.title.replace(/#([^#]+)#/g, '')
-    }
+    tasks = await preProcess(tasks)
     commit('setCount', {countActive, countCompleted})
     commit('clearTasks')
     commit('appendTasks', {tasks})
   },
   async appendTasksAsync ({commit, state}, options) {
     let tasks = await TaskAPI.findAllTask('/' + options)
-    for (let task of tasks) {
-      let tags = task.title.match(/#([^#]+)#/g)
-      if (tags != null) {
-        for (let index in tags) {
-          tags[index] = {
-            text: tags[index].match(/#([^#]+)#/)[1],
-            color: await getRandomColor(tags[index].match(/#([^#]+)#/)[1])
-          }
-        }
-      }
-      task.tags = tags
-      task.tagsFree = task.title.replace(/#([^#]+)#/g, '')
-    }
+    tasks = await preProcess(tasks)
     commit('appendTasks', {tasks})
   },
   async addTaskAsync ({commit, state}, task) {
-    task = await TaskAPI.addTask(task)
-    commit('addTask', {task})
+    let _task = await TaskAPI.addTask(task)
+    _task = (await preProcess([_task]))[0]
+    console.log(_task)
+    commit('addTask', {task: _task})
   },
   async deleteTaskAsync ({commit, state}, {task}) {
     await TaskAPI.deleteTask('/' + task.uid)

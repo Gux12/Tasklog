@@ -107,6 +107,7 @@ router.post('/item', function (req, res) {
   sha256.update(data.toString() + new Date())
   data.uid = sha256.digest('hex')
   data.create_time = new Date().getTime()
+  data.user_uid = req.session.user.uid
   // 数据库添加一条
   DB.task.add(data, function (err, data1) {
     if (!err) res.send({ResultCode: 0, Record: data, Message: '添加任务成功'})
