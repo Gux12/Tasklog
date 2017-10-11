@@ -21,8 +21,8 @@
     data () {
       return {
         paths: [
-          {'path': '/task/active/全部', 'value': '任务流'},
-          {'path': '/log', 'value': '工作流'}
+          {'path': '/task/active/全部', 'value': '任务流'}
+//          {'path': '/log', 'value': '工作流'}
 //          {'path': '/recycle/active', 'value': '回收站'}
         ]
       }

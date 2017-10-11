@@ -23,7 +23,7 @@
       async login () {
         let {username, pwd} = this
         await this.$store.dispatch('user/login', {username, pwd})
-        this.$router.push('/log')
+        this.$router.push('/task/active/全部')
       }
     }
   }
@@ -37,19 +37,6 @@
       background-color: $color-primary;
       height: 100%;
       position: relative;
-      /*&:before {*/
-      /*background-image: url(/static/img/banner-shape@2x.png);*/
-      /*background-size: 2880px 560px;*/
-      /*content: '';*/
-      /*opacity: 0.8;*/
-      /*background-repeat: no-repeat;*/
-      /*background-position: center bottom;*/
-      /*position: absolute;*/
-      /*width: 100%;*/
-      /*height: 35em;*/
-      /*bottom: 0;*/
-      /*left: 0;*/
-      /*}*/
     }
     .login_form {
       & :last-child {

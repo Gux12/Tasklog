@@ -1,5 +1,20 @@
 <template>
   <section class="taskapp">
+    <Draggable :zIndex="4" :left="20" :top="20" v-show="doneType === 'active'"
+               style="display: flex;align-items: center;flex-flow: column">
+      <div class="tags_btn"
+           @click="showTags = !showTags">
+      </div>
+      <div v-show="showTags" class="tags_connector">|||</div>
+      <div :class="['tags_wrapper',showTags?'':'hidden']">
+        <div :class="['tags_tag',~tagsType.indexOf(tag.text)?'selected':'']" size="small" v-for="tag in tagsArray"
+             :key="tag.text"
+             @click="$router.push('/task/' + $route.params.type + '/' + tag.text)">
+          <span>{{tag.text}}</span>
+          <mt-badge size="small" type="error">{{tag.count}}</mt-badge>
+        </div>
+      </div>
+    </Draggable>
     <!-- header -->
     <header class="header">
       <span class="header_label">任务</span>
@@ -11,21 +26,6 @@
     </header>
     <!--main section-->
     <section class="main">
-      <Draggable :zIndex="4000" :left="20" :top="20" v-show="doneType === 'active'"
-                 style="display: flex;align-items: center;flex-flow: column">
-        <div class="tags_btn"
-             @click="showTags = !showTags">
-        </div>
-        <div v-show="showTags" class="tags_connector">|||</div>
-        <div :class="['tags_wrapper',showTags?'':'hidden']">
-          <div :class="['tags_tag',~tagsType.indexOf(tag.text)?'selected':'']" size="small" v-for="tag in tagsArray"
-               :key="tag.text"
-               @click="$router.push('/task/' + $route.params.type + '/' + tag.text)">
-            <span>{{tag.text}}</span>
-            <mt-badge size="small" type="error">{{tag.count}}</mt-badge>
-          </div>
-        </div>
-      </Draggable>
       <mt-loadmore
         style="min-height: 100%"
         :top-method="loadTop"
@@ -59,9 +59,9 @@
             </section>
           </section>
         </section>
-        <section style="text-align: center;color: #999999;margin-top: 20px" v-else>
-          <span>暂无任务</span>
-        </section>
+        <!--<section style="text-align: center;color: #999999;margin-top: 20px" v-else>-->
+        <!--<span>暂无任务</span>-->
+        <!--</section>-->
       </mt-loadmore>
     </section>
     <!-- footer -->
@@ -74,6 +74,11 @@
         </span>
       </mt-tab-item>
     </mt-tabbar>
+    <mt-palette-button content="+" class="task_workflow" direction="t"
+                       mainButtonStyle="color:#fff;background-color:#36b9ae;">
+      <div class="my-icon-button" @click="addTaskAsync({title: '#睡觉#又是美好的一天！', done: false})">睡觉</div>
+      <div class="my-icon-button" @click="addTaskAsync({title: '#上班统计#开始上班啦！', done: false})">上班</div>
+    </mt-palette-button>
     <mt-popup
       v-model="popupVisible"
       style="width: 100%;height: 100%;background-color: white"
@@ -122,11 +127,11 @@
       return {
         filters: filters,
         taskInput: '',
-        showDays: 5,
+        showDays: 365,
         loadMoreDays: 3,
-        currentShowDays: 5,
+        currentShowDays: 365,
         ready: false,
-        allLoaded: false,
+        allLoaded: true,
         popupVisible: false,
         selectedTask: null,
         showTags: false
@@ -255,8 +260,8 @@
         this.$refs.loadmore.onTopLoaded()
       },
       async loadBottom () {
-        await this.appendTasksAsync(`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}`)
-//        if (res === '') this.allLoaded = true
+        let res = await this.appendTasksAsync(`create_time?end=${this.dateToday.getTime() - (this.currentShowDays) * 86400000}&start=${this.dateToday.getTime() - (this.currentShowDays + this.loadMoreDays) * 86400000}`)
+        if (res === '') this.allLoaded = true
         this.currentShowDays += this.loadMoreDays
         this.$refs.loadmore.onBottomLoaded()
       }
@@ -283,7 +288,6 @@
       position: fixed;
       width: 100%;
       box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
-      z-index: 1;
       padding: 5px 10px;
       background-color: white;
       .header_label {
@@ -341,7 +345,6 @@
     }
     .tags_wrapper {
       box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-      z-index: 3000;
       border: 4px solid $color-primary;
       max-height: 400px;
       overflow: auto;
@@ -402,7 +405,21 @@
     }
     .task_footer {
       box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
-      z-index: 1000;
+    }
+    .task_workflow {
+      bottom: 60px;
+      left: calc(50% - 30px);
+      position: fixed;
+      .my-icon-button{
+        background: $color-success;
+        font-size: 0.8rem;
+        width: auto;
+        height: auto;
+        line-height: 1em;
+        padding: 5px 5px;
+        color: #fff;
+        border-radius: 1em;
+      }
     }
   }
 

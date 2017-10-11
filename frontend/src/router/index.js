@@ -53,10 +53,6 @@ const router = new Router({
       redirect: '/recycle/active'
     },
     {
-      path: '/',
-      redirect: '/log'
-    },
-    {
       path: '*',
       redirect: '/hello'
     }
