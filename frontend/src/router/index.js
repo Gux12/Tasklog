@@ -54,7 +54,7 @@ const router = new Router({
     },
     {
       path: '*',
-      redirect: '/hello'
+      redirect: '/task/active/全部'
     }
   ]
 })
