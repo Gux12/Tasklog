@@ -189,7 +189,7 @@
           let itemDate = {
             year: date.getFullYear(),
             month: (Array(2).join(0) + (date.getMonth() + 1)).slice(-2),
-            date: (Array(2).join(0) + (date.getDate() + 1)).slice(-2),
+            date: (Array(2).join(0) + (date.getDate())).slice(-2),
             day: date.getDay() + 1
           }
           if (groupByDate[itemDate.year] === undefined) groupByDate[itemDate.year] = {}
@@ -220,7 +220,7 @@
           let itemDate = {
             year: date.getFullYear(),
             month: (Array(2).join(0) + (date.getMonth() + 1)).slice(-2),
-            date: (Array(2).join(0) + (date.getDate() + 1)).slice(-2),
+            date: (Array(2).join(0) + (date.getDate())).slice(-2),
             day: date.getDay() + 1
           }
           if (timeLine[itemDate.year] === undefined) timeLine[itemDate.year] = {}
